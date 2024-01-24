@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>T1566 - HTA file opens cmd</title>
+    <HTA:APPLICATION 
+        APPLICATIONNAME="T1566HTAOpenCMD" 
+        ID="T1566HTAOpenCMD" 
+        VERSION="1.0" 
+        MAXIMIZEBUTTON="no" 
+        MINIMIZEBUTTON="no" 
+        BORDER="dialog"
+        SCROLL="no"
+        CONTEXTMENU="no"
+        SELECTION="no"/>
+    <script type="text/vbscript">
+        Sub Window_OnLoad
+            Dim fso, tempFolder, tempFile, tempFilePath
+            Set fso = CreateObject("Scripting.FileSystemObject")
+
+            ' Obtener la ruta de la carpeta temporal
+            tempFolder = fso.GetSpecialFolder(2) ' 2 corresponde a la carpeta temporal
+            tempFilePath = fso.BuildPath(tempFolder, "temp.bat")
+
+            ' Crear un archivo batch temporal
+            Set tempFile = fso.CreateTextFile(tempFilePath, True)
+            tempFile.WriteLine("echo Test executed")
+            tempFile.WriteLine("timeout /t 5")
+            tempFile.WriteLine("del " & Chr(34) & tempFilePath & Chr(34))
+            tempFile.Close
+
+            ' Ejecutar el archivo batch
+            Set shell = CreateObject("WScript.Shell")
+            shell.Run "cmd /c " & tempFilePath, 1, False
+
+            self.close
+        End Sub
+    </script>
+</head>
+<body>
+</body>
+</html>
